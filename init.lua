@@ -18,6 +18,10 @@ local showHidden        = false
 local lastInventoryScan = 0
 local collapsed         = false
 
+-- Track platinum received during a Sell Junk run
+local trackPlatDuringSell = false
+local totalPlatThisSell   = 0
+
 local settings_file     = mq.configDir .. "/vendor.lua"
 local custom_sources    = mq.configDir .. "/vendor_sources.lua"
 
@@ -68,6 +72,14 @@ local function LoadSettings()
 
     vendorInv = vendorInv:new(vendorSources)
 end
+
+-- Capture coin received messages to total platinum during Sell Junk
+mq.event('DerpleVend_PlatGain', '#*#You receive #1# platinum from#*#', function(_, plat)
+    if not trackPlatDuringSell then return end
+    local cleaned = (plat or '0'):gsub(',', '')
+    local amt = tonumber(cleaned) or 0
+    totalPlatThisSell = totalPlatThisSell + amt
+end)
 
 local function sellItem(item)
     if not mq.TLO.Window("MerchantWnd").Open() then
@@ -262,6 +274,11 @@ local function vendorGUI()
 
                 if ImGui.SmallButton(disabled and "Cancel Selling" or "Sell Junk") then
                     sellAllJunk = not sellAllJunk
+                    if sellAllJunk then
+                        -- Begin tracking platinum for this Sell Junk session
+                        trackPlatDuringSell = true
+                        totalPlatThisSell   = 0
+                    end
                 end
                 Tooltip(disabled and "Stop selling junk items" or "Sell all junk items")
 
@@ -353,17 +370,25 @@ while not terminate do
             if IsJunk(item.Item.Name()) then
                 sellItem(item)
                 mq.delay(50)
+                mq.doevents()
                 vendorInv:getItems(sourceIndex)
             end
 
             if not openGUI then return end
             if not sellAllJunk then break end
         end
-
+        
         Output("\amRefreshing inv...")
         vendorInv:createContainerInventory()
         vendorInv:getItems(sourceIndex)
         sellAllJunk = false
+        if trackPlatDuringSell then
+            mq.doevents()
+            Output("\agReceived \at%d\ag platinum from selling junk.", totalPlatThisSell)
+            -- Reset tracking after report
+            trackPlatDuringSell = false
+            totalPlatThisSell   = 0
+        end
     end
 
     mq.doevents()

@@ -74,12 +74,14 @@ local function LoadSettings()
 end
 
 -- Capture coin received messages to total platinum during Sell Junk
-mq.event('DerpleVend_PlatGain', '#*#You receive #1# platinum from#*#', function(_, plat)
-    if not trackPlatDuringSell then return end
-    local cleaned = (plat or '0'):gsub(',', '')
-    local amt = tonumber(cleaned) or 0
-    totalPlatThisSell = totalPlatThisSell + amt
-end)
+mq.event('DerpleVend_PlatGain',
+    '#*#You receive #1# platinum#*# from#*#',
+    function(_, plat)
+        if not trackPlatDuringSell then return end
+        local cleaned = (plat or '0'):gsub(',', '')
+        local amt = tonumber(cleaned) or 0
+        totalPlatThisSell = totalPlatThisSell + amt
+    end)
 
 local function sellItem(item)
     if not mq.TLO.Window("MerchantWnd").Open() then

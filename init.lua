@@ -1,33 +1,33 @@
-local mq                = require('mq')
-local ImGui             = require('ImGui')
-local Icons             = require('mq.Icons')
+local mq                  = require('mq')
+local ImGui               = require('ImGui')
+local Icons               = require('mq.Icons')
 
-local vendorInv         = require('vendor_inv')
-local actors            = require 'actors'
-local animItems         = mq.FindTextureAnimation("A_DragItem")
+local vendorInv           = require('vendor_inv')
+local actors              = require 'actors'
+local animItems           = mq.FindTextureAnimation("A_DragItem")
 
-local openGUI           = true
-local shouldDrawGUI     = false
+local openGUI             = true
+local shouldDrawGUI       = false
 
-local terminate         = false
+local terminate           = false
 
-local sourceIndex       = 1
-local sellAllJunk       = false
-local vendItem          = nil
-local showHidden        = false
-local lastInventoryScan = 0
-local collapsed         = false
+local sourceIndex         = 1
+local sellAllJunk         = false
+local vendItem            = nil
+local showHidden          = false
+local lastInventoryScan   = 0
+local collapsed           = false
 
 -- Track platinum received during a Sell Junk run
 local trackPlatDuringSell = false
 local totalPlatThisSell   = 0
 
-local settings_file     = mq.configDir .. "/vendor.lua"
-local custom_sources    = mq.configDir .. "/vendor_sources.lua"
+local settings_file       = mq.configDir .. "/vendor.lua"
+local custom_sources      = mq.configDir .. "/vendor_sources.lua"
 
-local settings          = {}
+local settings            = {}
 
-local Output            = function(msg, ...)
+local Output              = function(msg, ...)
     local formatted = msg
     if ... then
         formatted = string.format(msg, ...)
@@ -379,7 +379,7 @@ while not terminate do
             if not openGUI then return end
             if not sellAllJunk then break end
         end
-        
+
         Output("\amRefreshing inv...")
         vendorInv:createContainerInventory()
         vendorInv:getItems(sourceIndex)

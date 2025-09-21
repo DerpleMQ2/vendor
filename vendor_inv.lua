@@ -13,7 +13,7 @@ vendor_inv.genericSources     = {
     {
         name = "All Items",
         filter = function(item)
-            return (not item.NoDrop() and not item.NoRent()) and item.Value() > 0
+            return (not item.NoDrop() and not item.NoRent()) and (item.Value() or 0) > 0
         end,
     },
     {

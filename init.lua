@@ -64,6 +64,11 @@ local function LoadSettings()
     settings.Junk = settings.Junk or {}
     settings.Hide = settings.Hide or {}
 
+    if not settings.Colors then
+        settings.Colors = { Green = { R = 50, G = 205, B = 50, A = 255, }, Red = { R = 205, G = 50, B = 50, A = 255, }, }
+        SaveSettings()
+    end
+
     local vendorSources = {}
     local config, err = loadfile(custom_sources)
     if not err and config then
@@ -140,7 +145,6 @@ end
 
 local function renderItems()
     if ImGui.BeginTable("BagItemList", 5, bit32.bor(ImGuiTableFlags.Resizable, ImGuiTableFlags.Borders)) then
-        ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0, 1.0, 1)
         ImGui.TableSetupColumn('Icon', bit32.bor(ImGuiTableColumnFlags.NoSort, ImGuiTableColumnFlags.WidthFixed), 20.0)
         ImGui.TableSetupColumn('Item',
             bit32.bor(ImGuiTableColumnFlags.NoSort, ImGuiTableColumnFlags.PreferSortDescending,
@@ -149,7 +153,6 @@ local function renderItems()
         ImGui.TableSetupColumn('Junk', bit32.bor(ImGuiTableColumnFlags.NoSort, ImGuiTableColumnFlags.WidthFixed), 20.0)
         ImGui.TableSetupColumn('Sell', bit32.bor(ImGuiTableColumnFlags.NoSort, ImGuiTableColumnFlags.WidthFixed), 20.0)
         ImGui.TableSetupColumn('Hide', bit32.bor(ImGuiTableColumnFlags.NoSort, ImGuiTableColumnFlags.WidthFixed), 20.0)
-        ImGui.PopStyleColor()
         ImGui.TableHeadersRow()
 
         for idx, item in ipairs(vendorInv.items) do
@@ -170,9 +173,9 @@ local function renderItems()
                     end
                     ImGui.TableNextColumn()
                     if IsJunk(item.Item.Name()) then
-                        ImGui.PushStyleColor(ImGuiCol.Text, 0.02, 0.8, 0.02, 1.0)
+                        ImGui.PushStyleColor(ImGuiCol.Text, IM_COL32(settings.Colors.Green.R, settings.Colors.Green.G, settings.Colors.Green.B, settings.Colors.Green.A))
                     else
-                        ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.02, 0.02, 1.0)
+                        ImGui.PushStyleColor(ImGuiCol.Text, IM_COL32(settings.Colors.Red.R, settings.Colors.Red.G, settings.Colors.Red.B, settings.Colors.Red.A))
                     end
                     ImGui.PushID("#_btn_jnk" .. tostring(idx))
                     if ImGui.Selectable(Icons.FA_TRASH_O) then
@@ -188,9 +191,9 @@ local function renderItems()
                     end
                     ImGui.TableNextColumn()
                     if not IsHidden(item.Item.Name()) then
-                        ImGui.PushStyleColor(ImGuiCol.Text, 0.02, 0.8, 0.02, 1.0)
+                        ImGui.PushStyleColor(ImGuiCol.Text, IM_COL32(settings.Colors.Green.R, settings.Colors.Green.G, settings.Colors.Green.B, settings.Colors.Green.A))
                     else
-                        ImGui.PushStyleColor(ImGuiCol.Text, 0.8, 0.02, 0.02, 1.0)
+                        ImGui.PushStyleColor(ImGuiCol.Text, IM_COL32(settings.Colors.Red.R, settings.Colors.Red.G, settings.Colors.Red.B, settings.Colors.Red.A))
                     end
                     ImGui.PushID("#_btn_hide" .. tostring(idx))
                     if ImGui.Selectable(IsHidden(item.Item.Name()) and Icons.FA_EYE or Icons.FA_EYE_SLASH) then
